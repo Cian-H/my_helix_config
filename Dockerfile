@@ -11,19 +11,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
     ca-certificates \
-    build-essential \
-    unzip \
     ripgrep \
     fd-find \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Helix using the version resolved by the CI workflow
+# Install Helix — the release tarball already contains pre-built grammars
+# and query files under runtime/, so no grammar fetch/build step is needed
 RUN curl -L -o helix.tar.xz \
       "https://github.com/helix-editor/helix/releases/download/${HELIX_VERSION}/helix-${HELIX_VERSION}-x86_64-linux.tar.xz" \
-    && mkdir -p /opt/helix \
-    && tar -C /opt/helix --strip-components=1 -xJf helix.tar.xz \
-    && rm helix.tar.xz \
-    && ln -s /opt/helix/hx /usr/local/bin/hx
+    && tar -C /opt -xJf helix.tar.xz \
+    && mv "/opt/helix-${HELIX_VERSION}-x86_64-linux" /opt/helix \
+    && ln -s /opt/helix/hx /usr/local/bin/hx \
+    && rm helix.tar.xz
+
+# Point Helix at its bundled runtime directory
+ENV HELIX_RUNTIME=/opt/helix/runtime
 
 # Create a non-root user
 RUN useradd -m -s /bin/bash helixuser
@@ -34,8 +36,5 @@ WORKDIR /workspace
 # Copy the Helix configuration files
 RUN mkdir -p $HOME/.config/helix
 COPY --chown=helixuser:helixuser . $HOME/.config/helix
-
-# Pre-fetch and compile all Tree-sitter grammars
-RUN hx --grammar fetch && hx --grammar build
 
 ENTRYPOINT ["hx"]
