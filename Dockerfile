@@ -3,7 +3,10 @@ FROM ubuntu:24.04
 # Prevent interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install essential dependencies and Helix
+# Accept Helix version as a build argument (resolved in CI with auth)
+ARG HELIX_VERSION
+
+# Install essential dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
@@ -14,9 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fd-find \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Helix (latest stable precompiled binary via GitHub API)
-RUN HELIX_VERSION=$(curl -sSL https://api.github.com/repos/helix-editor/helix/releases/latest | grep '"tag_name"' | sed 's/.*"tag_name": "\(.*\)".*/\1/') \
-    && curl -L -o helix.tar.xz "https://github.com/helix-editor/helix/releases/download/${HELIX_VERSION}/helix-${HELIX_VERSION}-x86_64-linux.tar.xz" \
+# Install Helix using the version resolved by the CI workflow
+RUN curl -L -o helix.tar.xz "https://github.com/helix-editor/helix/releases/download/${HELIX_VERSION}/helix-${HELIX_VERSION}-x86_64-linux.tar.xz" \
     && mkdir -p /opt/helix \
     && tar -C /opt/helix --strip-components=1 -xJf helix.tar.xz \
     && rm helix.tar.xz \
