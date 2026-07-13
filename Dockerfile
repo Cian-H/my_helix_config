@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 FROM ubuntu:24.04
 
 # Prevent interactive prompts during package installation
@@ -34,8 +35,15 @@ WORKDIR /workspace
 RUN mkdir -p $HOME/.config/helix
 COPY --chown=helixuser:helixuser . $HOME/.config/helix
 
-# Fetch all language grammars and runtime files
-RUN hx --grammar fetch && hx --grammar build
+# Fetch all language grammars and runtime files using BuildKit secret for GitHub auth
+# Requires the build to provide a secret with id "github_token" (set in the workflow)
+# The secret is mounted at /run/secrets/github_token only during this RUN and is not persisted in image layers.
+RUN --mount=type=secret,id=github_token \
+    if [ -s /run/secrets/github_token ]; then \
+      GITHUB_TOKEN=$(cat /run/secrets/github_token) && \
+      git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; \
+    fi && \
+    hx --grammar fetch && hx --grammar build
 
 # Set up entrypoint
 ENTRYPOINT ["hx"]

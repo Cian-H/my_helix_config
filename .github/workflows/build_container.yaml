@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths-ignore:
-      - 'README.md'
+      - "README.md"
   workflow_dispatch:
 
 env:
@@ -64,4 +64,5 @@ jobs:
             HELIX_VERSION=${{ steps.helix_version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
+          secrets: |
+            github_token=${{ secrets.GITHUB_TOKEN }}
