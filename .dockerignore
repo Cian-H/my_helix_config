@@ -1,0 +1,7 @@
+.git
+.devenv
+.direnv
+devenv.lock
+devenv.nix
+devenv.yaml
+.envrc
