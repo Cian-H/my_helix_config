@@ -38,7 +38,7 @@ COPY --chown=helixuser:helixuser . $HOME/.config/helix
 # Fetch all language grammars and runtime files using BuildKit secret for GitHub auth
 # Run as root to read the secret (secret files are owned by root), then run hx as helixuser
 USER root
-RUN --mount=type=secret,id=github_token \
+RUN --mount=type=secret,id=github_token,mode=0444 \
   if [ -s /run/secrets/github_token ]; then \
     GITHUB_TOKEN=$(cat /run/secrets/github_token) && \
     git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; \
