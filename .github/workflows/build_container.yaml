@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths-ignore:
-      - "README.md"
+      - 'README.md'
   workflow_dispatch:
 
 env:
@@ -47,11 +47,11 @@ jobs:
 
       - name: Get latest Helix release version
         id: helix_version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=$(gh api repos/helix-editor/helix/releases/latest --jq '.tag_name')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
@@ -60,9 +60,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            HELIX_VERSION=${{ steps.helix_version.outputs.version }}
+          build-args: HELIX_VERSION=${{ steps.helix_version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          secrets: |
-            github_token=${{ secrets.GITHUB_TOKEN }}
