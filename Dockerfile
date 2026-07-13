@@ -37,13 +37,26 @@ COPY --chown=helixuser:helixuser . $HOME/.config/helix
 
 # Fetch all language grammars and runtime files using BuildKit secret for GitHub auth
 # Run as root to read the secret (secret files are owned by root), then run hx as helixuser
+# Use retries for network/transient errors and continue (with warning) if fetch ultimately fails.
 USER root
 RUN --mount=type=secret,id=github_token,mode=0444 \
+  set -euo pipefail; \
   if [ -s /run/secrets/github_token ]; then \
-    GITHUB_TOKEN=$(cat /run/secrets/github_token) && \
+    GITHUB_TOKEN=$(cat /run/secrets/github_token); \
     git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; \
-  fi && \
-  runuser -u helixuser -- /bin/bash -lc "hx --grammar fetch && hx --grammar build"
+  fi; \
+  echo "Secret metadata:"; ls -la /run/secrets || true; stat -c '%U:%G %a %n' /run/secrets/github_token 2>/dev/null || true; \
+  # Retry hx --grammar fetch up to 3 times with exponential backoff
+  n=0; until [ "$n" -ge 3 ]; do \
+    echo "Attempt $((n+1)) to fetch grammars..."; \
+    runuser -u helixuser -- /bin/bash -lc "hx --grammar fetch" && break; \
+    n=$((n+1)); sleep $((n*5)); \
+  done; \
+  if [ "$n" -ge 3 ]; then \
+    echo "Warning: hx --grammar fetch failed after 3 attempts; continuing build. Check logs for failing repositories."; \
+  fi; \
+  # Try to build grammars; if this fails, emit a warning but continue so the image can still be created.
+  runuser -u helixuser -- /bin/bash -lc "hx --grammar build" || echo "Warning: hx --grammar build failed; image may be missing grammars.\n"
 
 # Continue as non-root user
 USER helixuser
