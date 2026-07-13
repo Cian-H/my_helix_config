@@ -36,14 +36,17 @@ RUN mkdir -p $HOME/.config/helix
 COPY --chown=helixuser:helixuser . $HOME/.config/helix
 
 # Fetch all language grammars and runtime files using BuildKit secret for GitHub auth
-# Requires the build to provide a secret with id "github_token" (set in the workflow)
-# The secret is mounted at /run/secrets/github_token only during this RUN and is not persisted in image layers.
+# Run as root to read the secret (secret files are owned by root), then run hx as helixuser
+USER root
 RUN --mount=type=secret,id=github_token \
-    if [ -s /run/secrets/github_token ]; then \
-      GITHUB_TOKEN=$(cat /run/secrets/github_token) && \
-      git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; \
-    fi && \
-    hx --grammar fetch && hx --grammar build
+  if [ -s /run/secrets/github_token ]; then \
+    GITHUB_TOKEN=$(cat /run/secrets/github_token) && \
+    git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; \
+  fi && \
+  runuser -u helixuser -- /bin/bash -lc "hx --grammar fetch && hx --grammar build"
+
+# Continue as non-root user
+USER helixuser
 
 # Set up entrypoint
 ENTRYPOINT ["hx"]
