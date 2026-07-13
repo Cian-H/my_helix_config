@@ -1,0 +1,78 @@
+# Indentation overrides for common languages to match Neovim's 4-space defaults
+[[language]]
+name = "nix"
+indent = { tab-width = 4, unit = " " }
+
+[[language]]
+name = "lua"
+indent = { tab-width = 4, unit = " " }
+
+[[language]]
+name = "python"
+indent = { tab-width = 4, unit = " " }
+
+[[language]]
+name = "rust"
+indent = { tab-width = 4, unit = " " }
+
+[[language]]
+name = "javascript"
+indent = { tab-width = 4, unit = " " }
+
+[[language]]
+name = "typescript"
+indent = { tab-width = 4, unit = " " }
+
+[[language]]
+name = "html"
+indent = { tab-width = 4, unit = " " }
+
+[[language]]
+name = "css"
+indent = { tab-width = 4, unit = " " }
+
+[[language]]
+name = "bash"
+indent = { tab-width = 4, unit = " " }
+# Custom filetype definitions and comment string mappings
+
+[[language]]
+name = "scallop"
+scope = "source.scallop"
+file-types = ["scl"]
+comment-token = "//"
+indent = { tab-width = 4, unit = " " }
+
+[[language]]
+name = "prolog"
+scope = "source.prolog"
+file-types = ["prolog", "pro"]
+indent = { tab-width = 4, unit = " " }
+
+[[language]]
+name = "nu"
+scope = "source.nu"
+file-types = ["nu"]
+comment-token = "#"
+indent = { tab-width = 4, unit = " " }
+
+[[language]]
+name = "mojo"
+scope = "source.mojo"
+file-types = ["mojo"]
+comment-token = "#"
+indent = { tab-width = 4, unit = " " }
+
+[[language]]
+name = "pig"
+scope = "source.pig"
+file-types = ["pig"]
+comment-token = "--"
+indent = { tab-width = 4, unit = " " }
+
+[[language]]
+name = "hive"
+scope = "source.hive"
+file-types = ["hive", "hql"]
+comment-token = "--"
+indent = { tab-width = 4, unit = " " }

@@ -1,0 +1,74 @@
+theme = "tokyonight"
+
+[editor]
+line-number = "relative"
+cursorline = true
+scrolloff = 4
+idle-timeout = 300
+shell = ["nu", "-c"]
+true-color = true
+
+[editor.whitespace]
+render = "all"
+
+[editor.whitespace.characters]
+tab = "»"
+tabpad = " "
+space = "·"
+nbsp = "␣"
+
+[keys.normal]
+# Window Navigation
+"A-h" = "jump_view_left"
+"A-j" = "jump_view_down"
+"A-k" = "jump_view_up"
+"A-l" = "jump_view_right"
+
+# Splits & Close
+"A-n" = "hsplit"
+"A-;" = "swap_view_right"
+"A-q" = ":q"
+
+# Clear search highlights and collapse selections
+"esc" = ["collapse_selection", "keep_primary_selection", ":clear-register /"]
+
+# Goto mappings matching Neovim
+"g" = { "e" = "goto_declaration", "t" = "goto_type_definition" }
+
+# Space leader mappings
+[keys.normal.space]
+# Format
+"f" = ":format"
+
+# Space Space to find buffers (buffer_picker)
+"space" = "buffer_picker"
+
+# Rename symbol
+"r" = "rename_symbol"
+
+# Code actions
+"c" = { "a" = "code_action" }
+
+# Diagnostics float
+"d" = { "d" = "diagnostics_picker" }
+
+# Tree explorer and Oil file manager mirroring Neovim
+"t" = { "t" = "file_explorer" }
+
+# Telescope-like search sub-menu mirroring <leader>s
+[keys.normal.space.s]
+"f" = "file_picker"
+"b" = "file_picker_in_current_directory"
+"g" = "global_search"
+"d" = "diagnostics_picker"
+"r" = "last_picker"
+"s" = "command_palette"
+"w" = [
+  "move_char_right",
+  "move_prev_word_start",
+  "move_next_word_end",
+  "search_selection",
+  "global_search",
+]
+"h" = "command_palette"
+"k" = "command_palette"
